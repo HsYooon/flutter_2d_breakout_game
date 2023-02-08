@@ -33,7 +33,7 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables {
     const paddleSize = Size(4.0, 0.8);
     final paddlePosition = Vector2(size.x / 2.0, size.y * 0.85);
 
-    final paddle = Paddle(size: paddleSize, position: paddlePosition);
+    final paddle = Paddle(size: paddleSize, position: paddlePosition,ground: arena);
     await add(paddle);
 
     _ball = Ball(

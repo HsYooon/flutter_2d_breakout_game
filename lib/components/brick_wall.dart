@@ -28,6 +28,7 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
     await _buildWall();
   }
 
+
   Future<void> _buildWall() async {
     final wallSize = size ??
     Size(
@@ -51,5 +52,19 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
       brickPosition += Vector2((brickSize.width / 2.0 + gap)- brickPosition.x
           ,brickSize.height + gap);
     }
+  }
+
+  @override
+  void update(double dt) {
+    for(final child in [...children]) {
+      if(child is Brick && child.destroy) {
+        for (final fixture in [...child.body.fixtures]) {
+          child.body.destroyFixture(fixture);
+        }
+        gameRef.world.destroyBody(child.body);
+        remove(child);
+      }
+    }
+    super.update(dt);
   }
 }

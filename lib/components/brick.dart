@@ -3,8 +3,11 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_tutorial/forge2d_game_world.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
-class Brick extends BodyComponent<Forge2DGameWorld> {
+import 'ball.dart';
+
+class Brick extends BodyComponent<Forge2DGameWorld> with ContactCallbacks{
   final Size size;
   final Vector2 position;
 
@@ -13,6 +16,7 @@ class Brick extends BodyComponent<Forge2DGameWorld> {
   @override
   Body createBody() {
     final bodyDef = BodyDef()
+        ..userData = this
         ..type = BodyType.static
         ..position = position
         ..angularDamping = 1.0
@@ -29,6 +33,14 @@ class Brick extends BodyComponent<Forge2DGameWorld> {
       ..restitution = 0.1,
     );
     return brickBody;
+  }
+  var destroy = false;
+
+  @override
+  void beginContact(Object other, Contact contact) {
+    if(other is Ball) {
+      destroy = true;
+    }
   }
 
 }

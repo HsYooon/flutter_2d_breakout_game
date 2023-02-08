@@ -12,6 +12,7 @@ class Ball extends BodyComponent<Forge2DGameWorld> {
   @override
   Body createBody() {
     final bodyDef = BodyDef()
+        ..userData = this
         ..type = BodyType.dynamic
         ..position = positoin;
     final ball = world.createBody(bodyDef);
