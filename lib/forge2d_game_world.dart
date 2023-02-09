@@ -1,14 +1,26 @@
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_tutorial/components/arena.dart';
+import 'package:flame_tutorial/components/dead_zone.dart';
 import 'package:flame_tutorial/components/paddle.dart';
 import 'components/brick_wall.dart';
 import 'components/ball.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
 
+// Define Games state
+enum GameState {
+  initializing,
+  ready,
+  running,
+  paused,
+  won,
+  lost,
+}
+
 class Forge2DGameWorld extends Forge2DGame with HasDraggables {
   Forge2DGameWorld() : super(gravity: Vector2.zero(), zoom : 20);
 
+  GameState gameState = GameState.initializing;
   late final Ball _ball;
 
   @override
@@ -19,6 +31,9 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables {
   }
 
   Future<void> _initializeGame() async {
+    // Change Game state
+    gameState = GameState.ready;
+
     final arena = Arena();
     await add(arena);
 
@@ -42,6 +57,14 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables {
     );
     await add(_ball);
 
+    final deadZoneSize = Size(size.x, size.y * 0.1);
+    final deadZonePosition = Vector2(
+      size.x / 2.0,
+      size.y - (size.y * 0.1) / 2.0,
+    );
+
+    final deadZone = DeadZone(size: deadZoneSize, position: deadZonePosition);
+    await add(deadZone);
 
   }
 }
