@@ -1,4 +1,5 @@
 import 'package:flame/game.dart';
+import 'package:flame_tutorial/components/overlay_builder.dart';
 import '../forge2d_game_world.dart';
 import 'package:flutter/material.dart';
 
@@ -25,6 +26,9 @@ class _MainGamePageState extends State<MainGamePage> {
         ),
         child: GameWidget(
           game: forge2dGameWorld,
+          overlayBuilderMap: const {
+            'PreGame' : OverlayBuilder.preGame,
+          },
         )
       ),
     );

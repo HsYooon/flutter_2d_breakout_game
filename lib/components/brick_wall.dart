@@ -56,6 +56,9 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
 
   @override
   void update(double dt) {
+    if (children.isNotEmpty) {
+      gameRef.gameState = GameState.won;
+    }
     for(final child in [...children]) {
       if(child is Brick && child.destroy) {
         for (final fixture in [...child.body.fixtures]) {

@@ -11,6 +11,9 @@ class DeadZone extends BodyComponent<Forge2DGameWorld> with ContactCallbacks {
   final Size size;
   final Vector2 position;
 
+  @override
+  bool get renderBody => false;
+
   DeadZone({
     required this.size,
     required this.position
@@ -25,7 +28,7 @@ class DeadZone extends BodyComponent<Forge2DGameWorld> with ContactCallbacks {
     final zoneBody = world.createBody(bodyDef);
 
     final shape = PolygonShape()
-    ..setAsBox(size.width, size.height, Vector2.zero(), 0.0);
+    ..setAsBox(size.width / 2.0, size.height/ 2.0, Vector2.zero(), 0.0);
 
     zoneBody.createFixture(FixtureDef(shape)..isSensor = true);
     return zoneBody;

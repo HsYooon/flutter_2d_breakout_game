@@ -6,6 +6,8 @@ import 'components/brick_wall.dart';
 import 'components/ball.dart';
 import 'package:flutter/material.dart';
 import 'package:flame/game.dart';
+import 'package:flame/extensions.dart';
+import 'package:flame/input.dart';
 
 // Define Games state
 enum GameState {
@@ -17,7 +19,7 @@ enum GameState {
   lost,
 }
 
-class Forge2DGameWorld extends Forge2DGame with HasDraggables {
+class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
   Forge2DGameWorld() : super(gravity: Vector2.zero(), zoom : 20);
 
   GameState gameState = GameState.initializing;
@@ -26,13 +28,12 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables {
   @override
   Future<void> onLoad() async{
     await _initializeGame();
-    
-    _ball.body.applyLinearImpulse((Vector2(-10,-10)));
   }
 
   Future<void> _initializeGame() async {
     // Change Game state
     gameState = GameState.ready;
+    overlays.add('PreGame');
 
     final arena = Arena();
     await add(arena);
@@ -46,18 +47,20 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables {
     await add(brickWall);
 
     const paddleSize = Size(4.0, 0.8);
-    final paddlePosition = Vector2(size.x / 2.0, size.y * 0.85);
+    final deadZoneSize = Size(size.x, size.y * 0.1);
+    final paddlePosition = Vector2(size.x / 2.0, size.y - deadZoneSize.height - paddleSize.height/2.0);
 
     final paddle = Paddle(size: paddleSize, position: paddlePosition,ground: arena);
     await add(paddle);
 
+    final ballPosition = Vector2(size.x / 2.0, size.y / 2.0 + 10.0);
     _ball = Ball(
       radius: 0.5,
-      positoin: size/2,
+      positoin: ballPosition,
     );
     await add(_ball);
 
-    final deadZoneSize = Size(size.x, size.y * 0.1);
+
     final deadZonePosition = Vector2(
       size.x / 2.0,
       size.y - (size.y * 0.1) / 2.0,
@@ -66,5 +69,24 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables {
     final deadZone = DeadZone(size: deadZoneSize, position: deadZonePosition);
     await add(deadZone);
 
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt);
+
+    if(gameState == GameState.lost || gameState == GameState.won) {
+      pauseEngine();
+    }
+  }
+
+  @override
+  void onTapDown(int pointerId, TapDownInfo info) {
+    if(gameState == GameState.ready) {
+      overlays.remove('PreGame');
+      _ball.body.applyLinearImpulse(Vector2(-10.0, -10.0));
+      gameState = GameState.running;
+    }
+    super.onTapDown(pointerId, info);
   }
 }
