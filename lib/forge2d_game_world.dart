@@ -1,3 +1,4 @@
+import 'package:flame/components.dart';
 import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_tutorial/components/arena.dart';
 import 'package:flame_tutorial/components/dead_zone.dart';
@@ -59,8 +60,8 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
       positoin: ballPosition,
     );
     await add(_ball);
-
-
+    print("[1]");
+    print(gameState);
     final deadZonePosition = Vector2(
       size.x / 2.0,
       size.y - (size.y * 0.1) / 2.0,
@@ -69,6 +70,8 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
     final deadZone = DeadZone(size: deadZoneSize, position: deadZonePosition);
     await add(deadZone);
 
+    print("[2]");
+    print(gameState);
   }
 
   @override
@@ -82,11 +85,17 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
 
   @override
   void onTapDown(int pointerId, TapDownInfo info) {
+    print("onTabl Down called");
+    print(info);
     if(gameState == GameState.ready) {
       overlays.remove('PreGame');
       _ball.body.applyLinearImpulse(Vector2(-10.0, -10.0));
       gameState = GameState.running;
     }
     super.onTapDown(pointerId, info);
+  }
+
+  Future<void> resetGame() async {
+
   }
 }
