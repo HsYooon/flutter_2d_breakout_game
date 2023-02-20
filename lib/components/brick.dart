@@ -4,14 +4,15 @@ import 'package:flame_forge2d/flame_forge2d.dart';
 import 'package:flame_tutorial/forge2d_game_world.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:flame/components.dart';
 import 'ball.dart';
 
 class Brick extends BodyComponent<Forge2DGameWorld> with ContactCallbacks{
   final Size size;
   final Vector2 position;
+  final Color color;
 
-  Brick({required this.size, required this.position});
+  Brick({required this.size, required this.position, required this.color});
 
   @override
   Body createBody() {
@@ -41,6 +42,25 @@ class Brick extends BodyComponent<Forge2DGameWorld> with ContactCallbacks{
     if(other is Ball) {
       destroy = true;
     }
+  }
+  @override
+  void render(Canvas canvas) {
+    if(body.fixtures.isEmpty) {
+      return;
+    }
+
+    final rectangle = body.fixtures.first.shape as PolygonShape;
+
+    final paint = Paint()
+    ..color = color
+    ..style = PaintingStyle.fill;
+
+    canvas.drawRect(
+        Rect.fromCenter(
+            center: rectangle.centroid.toOffset(),
+            width: size.width,
+            height: size.height),
+        paint);
   }
 
 }

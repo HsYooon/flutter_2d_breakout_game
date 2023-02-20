@@ -3,7 +3,9 @@
 import 'package:flame/components.dart';
 import 'package:flame_tutorial/components/brick.dart';
 import 'package:flame_tutorial/forge2d_game_world.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 
 class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
   final Vector2 position;
@@ -11,6 +13,8 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
   final int rows;
   final int columns;
   final double gap;
+
+  late final List<Color> _colors;
 
   BrickWall({
     Vector2? position,
@@ -23,8 +27,18 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
   columns = columns ?? 1,
   gap = gap ?? 0.1;
 
+  static const transparancy = 1.0;
+  static const saturation = 0.85;
+  static const lightness = 0.5;
+
+  List<Color> _colorSet(int count) => List<Color>.generate(count, (index) =>
+      HSLColor.fromAHSL(transparancy, index/count * 360.0, saturation, lightness).toColor(),
+    growable: false,
+  );
+
   @override
   Future<void> onLoad() async {
+    _colors = _colorSet(rows);
     await _buildWall();
   }
 
@@ -46,7 +60,7 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
 
     for(var i =0; i< rows; i++ ) {
       for (var j = 0; j < columns; j++ ) {
-        await add(Brick(size: brickSize, position: brickPosition));
+        await add(Brick(size: brickSize, position: brickPosition, color: _colors[i]));
         brickPosition += Vector2(brickSize.width + gap, 0.0);
       }
       brickPosition += Vector2((brickSize.width / 2.0 + gap)- brickPosition.x
@@ -70,4 +84,11 @@ class BrickWall extends Component with HasGameRef<Forge2DGameWorld> {
     }
     super.update(dt);
   }
+
+  Future<void> reset() async {
+    removeAll(children);
+    await _buildWall();
+  }
+
+
 }

@@ -61,7 +61,7 @@ class PostGameOverlay extends StatelessWidget {
     );
   }
 
-  Widget _resetButton(BuildContext context, Forge2DGameWorld gaame) {
+  Widget _resetButton(BuildContext context, Forge2DGameWorld game) {
     return OutlinedButton.icon(onPressed: () => game.resetGame(),
         icon : const Icon(Icons.restart_alt_outlined), label: const Text("Replay"));
 

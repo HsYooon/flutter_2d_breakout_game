@@ -25,6 +25,10 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
 
   GameState gameState = GameState.initializing;
   late final Ball _ball;
+  late final Arena _arena;
+  late final Paddle _paddle;
+  late final DeadZone _deadZone;
+  late final BrickWall _brickWall;
 
   @override
   Future<void> onLoad() async{
@@ -36,23 +40,23 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
     gameState = GameState.ready;
     overlays.add('PreGame');
 
-    final arena = Arena();
-    await add(arena);
+    _arena = Arena();
+    await add(_arena);
 
     final brickWallPosition = Vector2(0.0, size.y * 0.075);
-    final brickWall = BrickWall(
+    _brickWall = BrickWall(
       position: brickWallPosition,
       rows: 8,
       columns: 6,
     );
-    await add(brickWall);
+    await add(_brickWall);
+
 
     const paddleSize = Size(4.0, 0.8);
     final deadZoneSize = Size(size.x, size.y * 0.1);
     final paddlePosition = Vector2(size.x / 2.0, size.y - deadZoneSize.height - paddleSize.height/2.0);
-
-    final paddle = Paddle(size: paddleSize, position: paddlePosition,ground: arena);
-    await add(paddle);
+    _paddle = Paddle(size: paddleSize, position: paddlePosition,ground: _arena);
+    await add(_paddle);
 
     final ballPosition = Vector2(size.x / 2.0, size.y / 2.0 + 10.0);
     _ball = Ball(
@@ -60,18 +64,14 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
       positoin: ballPosition,
     );
     await add(_ball);
-    print("[1]");
-    print(gameState);
+
     final deadZonePosition = Vector2(
       size.x / 2.0,
       size.y - (size.y * 0.1) / 2.0,
     );
 
-    final deadZone = DeadZone(size: deadZoneSize, position: deadZonePosition);
-    await add(deadZone);
-
-    print("[2]");
-    print(gameState);
+    _deadZone = DeadZone(size: deadZoneSize, position: deadZonePosition);
+    await add(_deadZone);
   }
 
   @override
@@ -80,13 +80,12 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
 
     if(gameState == GameState.lost || gameState == GameState.won) {
       pauseEngine();
+      overlays.add('PostGame');
     }
   }
 
   @override
   void onTapDown(int pointerId, TapDownInfo info) {
-    print("onTabl Down called");
-    print(info);
     if(gameState == GameState.ready) {
       overlays.remove('PreGame');
       _ball.body.applyLinearImpulse(Vector2(-10.0, -10.0));
@@ -96,6 +95,18 @@ class Forge2DGameWorld extends Forge2DGame with HasDraggables,HasTappables {
   }
 
   Future<void> resetGame() async {
+    gameState = GameState.initializing;
+
+    _ball.reset();
+    _paddle.reset();
+    await _brickWall.reset();
+
+    gameState = GameState.ready;
+
+    overlays.remove(overlays.activeOverlays.first);
+    overlays.add('PreGame');
+
+    resumeEngine();
 
   }
 }
